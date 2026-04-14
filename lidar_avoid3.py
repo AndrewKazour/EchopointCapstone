@@ -20,9 +20,6 @@ MAX_RANGE_M      = 3.0
 MIN_VALID_MM     = 150
 
 # ── Forward direction ──────────────────────────────────────
-# Forward is the RIGHT side of the LiDAR sensor = ~90° on the sensor.
-# Wave your hand in front of the robot and run the debug snippet
-# at the bottom of this file to confirm. Adjust if needed.
 FORWARD_CENTER   = 265    # degrees on sensor that points forward on robot
 FORWARD_HALF_ARC = 30    # ±30° → 60° cone total
 
@@ -143,9 +140,7 @@ class AvoidanceController:
     def _run(self):
         lidar = None
         try:
-            # ── Motor serial ──────────────────────────────────────────────
-            # LiDAR-only test mode: motor_ser = None → commands just print
-            # When STM32 is ready, comment out None and uncomment the 3 lines
+
             self._motor_ser = None
             # self._motor_ser = serial.Serial(MOTOR_PORT, BAUDRATE_MOTOR, timeout=0.1)
             # time.sleep(0.5)
@@ -209,9 +204,7 @@ class AvoidanceController:
         dir_name = "RIGHT" if turn_dir > 0 else "LEFT"
         print(f"  Turning {dir_name} to clear obstacle")
 
-        # ── Step 3: Turn — reads rolling scan buffer ───────────
-        # The main iter_scans loop keeps updating _latest_scan
-        # so forward_dist reflects real-time sensor data while turning
+
         clear_threshold = ZONE_DANGER + CLEAR_HYSTERESIS
 
         while not self._stop_event.is_set():
@@ -260,21 +253,3 @@ if __name__ == "__main__":
     main()
 
 
-# ─────────────────────────────────────────────────────────────
-# FORWARD_CENTER DEBUG SNIPPET
-# Run this separately, wave your hand in front of the robot,
-# and look for which angle consistently shows small distances.
-# Set that angle as FORWARD_CENTER above.
-# ─────────────────────────────────────────────────────────────
-#
-# from rplidar import RPLidar
-# import time
-#
-# lidar = RPLidar('/dev/ttyUSB0', baudrate=115200, timeout=2)
-# time.sleep(1)
-# for i, scan in enumerate(lidar.iter_scans()):
-#     if i > 5: break
-#     close = [(round(a), round(d)) for (_, a, d) in scan if 100 < d < 800]
-#     close.sort()
-#     print(close[:10])
-# lidar.stop(); lidar.stop_motor(); lidar.disconnect()
